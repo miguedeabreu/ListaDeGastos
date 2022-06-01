@@ -1,5 +1,5 @@
-import styled from "styled-components";
-import {Link} from "react-router-dom";
+import styled from 'styled-components';
+import {Link} from 'react-router-dom';
 
 const Boton = styled(Link)`
     background: ${(props) => props.primario ? '#5B69E2' : '#000'};

@@ -3,31 +3,40 @@ import {Helmet} from 'react-helmet';
 import {Header, Titulo, ContenedorHeader} from './../elementos/Header';
 import Boton from './../elementos/Boton';
 import {Formulario, Input, ContenedorBoton} from './../elementos/ElementosDeFormulario';
-import {ReactComponent as SvgLogin} from './../imagenes/login.svg';
+import {ReactComponent as SvgLogin} from './../imagenes/registro.svg';
 import styled from 'styled-components';
-import {useNavigate} from 'react-router-dom';
 import {auth} from './../firebase/firebaseConfig';
+import {useNavigate} from 'react-router-dom';
 import Alerta from './../elementos/Alerta';
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 
 const Svg = styled(SvgLogin)`
 	width: 100%;
-	max-height: 12.5rem; /* 200px */
+	max-height: 6.25rem; /* 100px */
 	margin-bottom: 1.25rem; /* 20px */
 `;
 
-const InicioSesion = () => {
+const RegistroUsuarios = () => {
 	const navigate = useNavigate();
 	const [correo, establecerCorreo] = useState('');
 	const [password, establecerPassword] = useState('');
+	const [password2, establecerPassword2] = useState('');
 	const [estadoAlerta, cambiarEstadoAlerta] = useState(false);
 	const [alerta, cambiarAlerta] = useState({});
 
 	const handleChange = (e) => {
-		if(e.target.name === 'email'){
-			establecerCorreo(e.target.value);
-		} else if (e.target.name === 'password'){
-			establecerPassword(e.target.value);
+		switch(e.target.name){
+			case 'email':
+				establecerCorreo(e.target.value);
+				break;
+			case 'password':
+				establecerPassword(e.target.value);
+				break;
+			case 'password2':
+				establecerPassword2(e.target.value);
+				break;
+			default:
+				break;
 		}
 	}
 
@@ -47,7 +56,7 @@ const InicioSesion = () => {
 			return;
 		}
 
-		if(correo === '' || password === ''){
+		if(correo === '' || password === '' || password2 === ''){
 			cambiarEstadoAlerta(true);
 			cambiarAlerta({
 				tipo: 'error',
@@ -56,20 +65,32 @@ const InicioSesion = () => {
 			return;
 		}
 
+		if(password !== password2){
+			cambiarEstadoAlerta(true);
+			cambiarAlerta({
+				tipo: 'error',
+				mensaje: 'Las contraseñas no son iguales'
+			});
+			return;
+		}
+
 		try {
-			await signInWithEmailAndPassword(auth, correo, password);
+			await createUserWithEmailAndPassword(auth, correo, password);
 			navigate('/');
 		} catch(error) {
-			console.log(error)
 			cambiarEstadoAlerta(true);
+
 			let mensaje;
 			switch(error.code){
-				case 'auth/wrong-password':
-					mensaje = 'La contraseña no es correcta.'
+				case 'auth/invalid-password':
+					mensaje = 'La contraseña tiene que ser de al menos 6 caracteres.'
 					break;
-				case 'auth/user-not-found':
-					mensaje = 'No se encontro ninguna cuenta con este correo electrónico.'
-					break;
+				case 'auth/email-already-in-use':
+					mensaje = 'Ya existe una cuenta con el correo electrónico proporcionado.'
+				break;
+				case 'auth/invalid-email':
+					mensaje = 'El correo electrónico no es válido.'
+				break;
 				default:
 					mensaje = 'Hubo un error al intentar crear la cuenta.'
 				break;
@@ -77,19 +98,20 @@ const InicioSesion = () => {
 
 			cambiarAlerta({tipo: 'error', mensaje: mensaje});
 		}
+
 	}
 
 	return (
 		<>
 			<Helmet>
-				<title>Iniciar Sesión</title>
+				<title>Crear Cuenta</title>
 			</Helmet>
 
 			<Header>
 				<ContenedorHeader>
-					<Titulo>Iniciar Sesión</Titulo>
+					<Titulo>Crear Cuenta</Titulo>
 					<div>
-						<Boton to="/crear-cuenta">Registrarse</Boton>
+						<Boton to="/iniciar-sesion">Iniciar Sesion</Boton>
 					</div>
 				</ContenedorHeader>
 			</Header>
@@ -110,8 +132,15 @@ const InicioSesion = () => {
 					value={password}
 					onChange={handleChange}
 				/>
+				<Input 
+					type="password"
+					name="password2"
+					placeholder="Repetir la contraseña"
+					value={password2}
+					onChange={handleChange}
+				/>
 				<ContenedorBoton>
-					<Boton as="button" primario type="submit">Iniciar Sesión</Boton>
+					<Boton as="button" primario type="submit">Crear Cuenta</Boton>
 				</ContenedorBoton>
 			</Formulario>
 
@@ -125,4 +154,4 @@ const InicioSesion = () => {
 	);
 }
  
-export default InicioSesion;
+export default RegistroUsuarios;

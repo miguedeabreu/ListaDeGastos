@@ -1,7 +1,7 @@
-import React from "react";
-import styled from "styled-components";
-import {ReactComponent as IconoFlecha} from "../multimedia/flecha.svg";
-import {useNavigate} from "react-router-dom";
+import React from 'react';
+import styled from 'styled-components';
+import {ReactComponent as IconoFlecha} from './../imagenes/flecha.svg';
+import {useNavigate} from 'react-router-dom';
 
 const Btn = styled.button`
     display: block;

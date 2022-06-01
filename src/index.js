@@ -1,18 +1,21 @@
 import React from 'react';
-import ReactDOM from 'react-dom/client';
+import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import WebFont from 'webfontloader';
-import Contenedor from './elementos/contenedor';
+import Contenedor from './elementos/Contenedor';
 import {BrowserRouter, Route, Routes} from 'react-router-dom';
-import EditarGasto from './componentes/editarGasto';
-import GastosPorCategoria from './componentes/gastosPorCategoria';
-import InicioSesion from './componentes/inicioSesion';
-import ListaDeGastos from './componentes/listaDeGastos';
-import Registro from './componentes/registro';
-import {Helmet} from 'react-helmet';
-import favicon from './multimedia/logo.png';
-import Fondo from './elementos/fondo';
+import EditarGasto from './componentes/EditarGasto';
+import GastosPorCategoria from './componentes/GastosPorCategoria';
+import InicioSesion from './componentes/InicioSesion';
+import ListaDeGastos from './componentes/ListaDeGastos';
+import RegistroUsuarios from './componentes/RegistroUsuarios';
+import {Helmet} from "react-helmet";
+import favicon from './imagenes/logo.png';
+import Fondo from './elementos/Fondo';
+import {AuthProvider} from './contextos/AuthContext';
+import RutaPrivada from './componentes/RutaPrivada';
+import {TotalGastadoProvider} from './contextos/TotalGastadoEnElMesContext';
 
 WebFont.load({
   google: {
@@ -20,27 +23,54 @@ WebFont.load({
   }
 });
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
-  <React.StrictMode>
-    <>
-      <Helmet>
-        <link rel='shortcut icon' href={favicon} type='image/x-icon'/>
-      </Helmet>
-      <BrowserRouter>
-        <Contenedor>
-          <Routes>
-            <Route path='/inicio-sesion' element={<InicioSesion/>}/>
-            <Route path='/registro' element={<Registro/>}/>
-            <Route path='/categorias' element={<GastosPorCategoria/>}/>
-            <Route path='/lista' element={<ListaDeGastos/>}/>
-            <Route path='editar/:id' element={<EditarGasto/>}/>
-            <Route path='/' element={<App/>}/>
-          </Routes>
-        </Contenedor>
-      </BrowserRouter>
+const Index = () => {
+  return (
+	<>
+		<Helmet>
+			<link rel="shortcut icon" href={favicon} type="image/x-icon"/>
+		</Helmet>
 
-      <Fondo />
-    </>
-  </React.StrictMode>
-);
+		<AuthProvider>
+			<TotalGastadoProvider>
+				<BrowserRouter>
+					<Contenedor>
+						<Routes>
+							<Route path="/iniciar-sesion" element={<InicioSesion/>}/>
+							<Route path="/crear-cuenta" element={<RegistroUsuarios/>}/>
+							
+							<Route path="/categorias" element={
+								<RutaPrivada>
+									<GastosPorCategoria />
+								</RutaPrivada>
+							}/>
+
+							<Route path="/lista" element={
+								<RutaPrivada>
+									<ListaDeGastos />
+								</RutaPrivada>
+							} />
+
+							<Route path="/editar/:id" element={
+								<RutaPrivada>
+									<EditarGasto />
+								</RutaPrivada>
+							} />
+
+							<Route path="/" element={
+								<RutaPrivada>
+									<App />
+								</RutaPrivada>
+							} />
+							
+						</Routes>
+					</Contenedor>
+			</BrowserRouter>
+			</TotalGastadoProvider>
+		</AuthProvider>
+
+		<Fondo />
+	</>
+  );
+}
+
+ReactDOM.render(<Index />, document.getElementById('root'));
