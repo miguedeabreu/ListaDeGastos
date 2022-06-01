@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import Helmet from "react-helmet";
 import {Header, Titulo, ContenedorHeader} from "../elementos/header";
 import Boton from "../elementos/boton";
@@ -13,6 +13,24 @@ const Svg = styled(SvgLogin)`
 `
 
 const RegistroUsuarios = () => {
+    const [correo, establecerCorreo] = useState('');
+    const [password, establecerPassword] = useState('');
+    const [password2, establecerPassword2] = useState('');
+
+    const handleChange = (e) => {
+        switch(e.target.name){
+            case 'email':
+                establecerCorreo(e.target.value);
+                break;
+            case 'password':
+                establecerPassword(e.target.value);
+                break;
+            case 'password2':
+                establecerPassword2(e.target.value);
+                break;
+        }
+    }
+
     return ( 
         <>
             <Helmet>
@@ -34,16 +52,22 @@ const RegistroUsuarios = () => {
                     type="email"
                     name="email"
                     placeholder="Correo Electrónico"
+                    value={correo}
+                    onChange={handleChange}
                 />
                 <Input
                     type="password"
                     name="password"
                     placeholder="Contraseña"
+                    value={password}
+                    onChange={handleChange}
                 />
                 <Input
                     type="password"
                     name="password2"
                     placeholder="Repetir Contraseña"
+                    value={password2}
+                    onChange={handleChange}
                 />
                 <ContenedorBoton>
                     <Boton as="button" primario type="submit">Crear Cuenta</Boton>
